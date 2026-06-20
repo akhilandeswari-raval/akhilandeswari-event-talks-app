@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE and Tooling Configs
+.gemini/
+.agents/
+.idea/
+.vscode/
+
+# Local logs and output files
+*.log
+agy_out.txt

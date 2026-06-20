@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stay up to date with the latest Google Cloud BigQuery release notes. View, filter, and share updates on Twitter in real-time.">
+    <title>BigQuery Release Hub - Live Updates & Sharing</title>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Vanilla CSS Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Abstract Background Orbs for Atmosphere -->
+    <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+    <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand-container">
+                <div class="logo-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 6V12L16 14" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#a855f7" />
+                                <stop offset="1" stop-color="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>BigQuery Release Hub</h1>
+                    <p class="subtitle">Real-time Stream & Twitter Broadcast Tool</p>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <span class="status-dot pulsing" id="status-dot"></span>
+                    <span class="status-text" id="status-text">Checking feed...</span>
+                </div>
+                <button class="btn btn-primary" id="btn-refresh" aria-label="Refresh release notes">
+                    <svg class="icon icon-refresh" id="spinner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>Refresh Feed</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="app-main">
+            <!-- Filter & Search Panel -->
+            <section class="filter-panel" aria-label="Search and Filter">
+                <div class="search-box">
+                    <svg class="icon icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search updates (e.g., partitioned tables, billing, preview)..." aria-label="Search updates">
+                </div>
+                <div class="filter-tags" id="filter-tags">
+                    <button class="tag active" data-type="all">All Updates</button>
+                    <button class="tag" data-type="feature">Features</button>
+                    <button class="tag" data-type="changed">Changes</button>
+                    <button class="tag" data-type="deprecated">Deprecations</button>
+                    <button class="tag" data-type="fixed">Fixes</button>
+                </div>
+            </section>
+
+            <!-- Loading Skeleton Grid -->
+            <section class="notes-grid skeleton" id="skeleton-grid" aria-hidden="true">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </section>
+
+            <!-- Error State Panel -->
+            <section class="error-panel hidden" id="error-panel">
+                <div class="error-icon" aria-hidden="true">⚠️</div>
+                <h2>Failed to Load Stream</h2>
+                <p id="error-message">Could not fetch release notes at this time.</p>
+                <button class="btn btn-secondary" id="btn-retry">Retry Fetching</button>
+            </section>
+
+            <!-- No Results Panel -->
+            <section class="no-results hidden" id="no-results-panel">
+                <h2>No matches found</h2>
+                <p>Try refining your search terms or selecting a different category filter.</p>
+            </section>
+
+            <!-- Main Content Grid -->
+            <section class="notes-grid" id="notes-grid">
+                <!-- Rendered dynamically -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Twitter Composer Modal (Glassmorphic) -->
+    <div class="modal-overlay hidden" id="composer-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-container">
+            <header class="modal-header">
+                <div class="modal-title-wrapper">
+                    <svg class="twitter-icon-header" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <h2 id="modal-title">Share Update on X (Twitter)</h2>
+                </div>
+                <button class="btn-close" id="btn-close-modal" aria-label="Close composer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </header>
+            
+            <div class="modal-body">
+                <div class="source-info">
+                    <span class="source-tag" id="modal-source-date">Date</span>
+                    <span class="source-tag type-badge" id="modal-source-type">Feature</span>
+                </div>
+                <div class="tweet-composer-area">
+                    <label for="tweet-textarea" class="sr-only">Tweet content</label>
+                    <textarea id="tweet-textarea" rows="6" maxlength="280" placeholder="What would you like to share?"></textarea>
+                    <div class="composer-stats">
+                        <div class="char-counter" id="char-counter">
+                            <svg class="progress-ring" width="24" height="24">
+                                <circle class="progress-ring__circle bg" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="transparent" r="10" cx="12" cy="12"/>
+                                <circle class="progress-ring__circle val" id="progress-ring-circle" stroke="var(--accent-primary)" stroke-width="2.5" fill="transparent" r="10" cx="12" cy="12"/>
+                            </svg>
+                            <span id="char-count-text">280</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" id="btn-copy-tweet">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy Text</span>
+                </button>
+                <button class="btn btn-twitter" id="btn-post-tweet">
+                    <svg class="icon-twitter" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>Post to X</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
